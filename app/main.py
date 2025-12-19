@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Depends, HTTPException
 from psycopg import connect
-from database.core import get_connection, pool
-from bizlogic import users as users_bl, books as books_bl, reviews as reviews_bl, follows as follows_bl
+from app.database.core import get_connection
+from app.bizlogic import users as users_bl, books as books_bl, reviews as reviews_bl, follows as follows_bl
 from pydantic import BaseModel
 
 app = FastAPI(title="Goodreads Clone Backend")
@@ -25,9 +25,11 @@ def get_conn():
 # ------------------------------
 # User Routes
 # ------------------------------
+
 @app.get("/users")
-def api_list_users(conn = Depends(get_conn)):
-    return users_bl.list_users(conn)
+def get_users(conn=Depends(get_connection)):
+    rows = conn.execute("SELECT id, name, created_at FROM users ORDER BY id").fetchall()
+    return rows
 
 @app.get("/users/{user_id}")
 def api_get_user(user_id: int, conn = Depends(get_conn)):
@@ -86,11 +88,3 @@ def api_unfollow_user(followee_id: int, follower_id: int, conn = Depends(get_con
 @app.get("/users/{user_id}/newsfeed")
 def api_get_newsfeed(user_id: int, conn = Depends(get_conn)):
     return follows_bl.get_newsfeed(conn, user_id)
-
-
-@app.on_event("shutdown")
-def shutdown_db_pool():
-    """
-    Close the connection pool when FastAPI shuts down.
-    """
-    pool.close()

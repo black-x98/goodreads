@@ -1,7 +1,4 @@
-from database.queries import users as users_queries
+from app.database.queries.users import list_users as list_users_query
 
-def get_user(conn, user_id: int):
-    return users_queries.get_user(conn, user_id=user_id)
-
-def list_users(conn):
-    return users_queries.list_users(conn)
+def list_users():
+    return list_users_query()

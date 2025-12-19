@@ -26,3 +26,17 @@ def list_users(conn) -> list[dict]:
     with conn.cursor(row_factory=dict_row) as cur:
         cur.execute(sql)
         return cur.fetchall()
+
+
+def insert_user(conn, *, name: str) -> dict:
+    """
+    Insert a new user and return it.
+    """
+    sql = """
+    INSERT INTO users (name)
+    VALUES (%(name)s)
+    RETURNING id, name, created_at;
+    """
+    with conn.cursor(row_factory=dict_row) as cur:
+        cur.execute(sql, {"name": name})
+        return cur.fetchone()

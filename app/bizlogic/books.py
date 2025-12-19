@@ -1,4 +1,4 @@
-from database.queries import books as books_queries
+from app.database.queries import books as books_queries
 
 def get_book(conn, book_id: int):
     return books_queries.get_book(conn, book_id=book_id)

@@ -1,4 +1,4 @@
-from database.queries import follows as follows_queries
+from app.database.queries import follows as follows_queries
 
 def follow_user(conn, *, follower_id, followee_id):
     return follows_queries.follow_user(

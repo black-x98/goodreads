@@ -1,4 +1,4 @@
-from database.queries import reviews as reviews_queries
+from app.database.queries import reviews as reviews_queries
 
 def add_review(conn, *, user_id, book_id, rating, content):
     return reviews_queries.insert_review(
