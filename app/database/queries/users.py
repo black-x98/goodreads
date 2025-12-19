@@ -1,6 +1,7 @@
 from psycopg.rows import dict_row
+from psycopg import Connection
 
-def get_user(conn, *, user_id: int) -> dict | None:
+def get_user(conn: Connection, *, user_id: int) -> dict | None:
     """
     Fetch a single user by ID.
     """
@@ -14,7 +15,7 @@ def get_user(conn, *, user_id: int) -> dict | None:
         return cur.fetchone()
 
 
-def list_users(conn) -> list[dict]:
+def list_users(conn: Connection) -> list[dict]:
     """
     Fetch all users.
     """
@@ -28,7 +29,7 @@ def list_users(conn) -> list[dict]:
         return cur.fetchall()
 
 
-def insert_user(conn, *, name: str) -> dict:
+def insert_user(conn: Connection, *, name: str) -> dict:
     """
     Insert a new user and return it.
     """
