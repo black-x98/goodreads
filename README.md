@@ -41,7 +41,7 @@ Accessing the API
 
 Open your browser and go to:
 
-http://127.0.0.1:8000/docs
+http://127.0.0.1:8000/docs 
 
 This is the FastAPI Swagger UI where you can:
 
@@ -76,6 +76,10 @@ DB_PASSWORD=postgres
 
 To stop the containers:
 
-docker compose down
+    docker compose down
 
 To persist DB data between runs, the project uses a Docker volume postgres_data.
+
+To run a basic integration test of the project, run the following command: 
+
+    python3.12 tests/integration_test.py
