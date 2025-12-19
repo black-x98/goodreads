@@ -1,4 +1,4 @@
-CREATE TABLE reviews (
+CREATE TABLE IF NOT EXISTS reviews (
     id BIGSERIAL PRIMARY KEY,
     user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     book_id BIGINT NOT NULL REFERENCES books(id) ON DELETE CASCADE,
@@ -7,4 +7,4 @@ CREATE TABLE reviews (
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX idx_reviews_user_created ON reviews(user_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_reviews_user_created ON reviews(user_id, created_at DESC);
