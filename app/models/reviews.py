@@ -6,8 +6,8 @@ from datetime import datetime
 class ReviewCreate(BaseModel):
     user_id: int
     book_id: int
-    rating: conint(ge=1, le=5)  # ensures rating is 1-5
-    content: str = Field(..., min_length=1, max_length=2000)
+    rating: int
+    content: str
 
 
 class ReviewOut(BaseModel):

@@ -6,27 +6,11 @@ from app.bizlogic import books as books_bl
 from app.bizlogic import reviews as reviews_bl
 from app.bizlogic import follows as follows_bl
 from app.database.seed import seed_data
+from app.models.books import BookCreate
+from app.models.reviews import ReviewCreate
+from app.models.users import UserCreate
 
 app = FastAPI(title="Goodreads Clone Backend")
-
-
-# ------------------------------
-# Pydantic Schemas
-# ------------------------------
-class UserCreate(BaseModel):
-    name: str
-
-
-class BookCreate(BaseModel):
-    title: str
-    author: str
-
-
-class ReviewCreate(BaseModel):
-    user_id: int
-    book_id: int
-    rating: int
-    content: str
 
 
 @app.on_event("startup")
