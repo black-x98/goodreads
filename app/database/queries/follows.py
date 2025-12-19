@@ -1,10 +1,6 @@
 from psycopg.rows import dict_row
-from psycopg import Connection
 
-def follow_user(conn: Connection, *, follower_id: int, followee_id: int) -> dict | None:
-    """
-    Follower follows followee.
-    """
+def follow_user(conn, *, follower_id: int, followee_id: int) -> dict | None:
     sql = """
     INSERT INTO followers (follower_id, followee_id)
     VALUES (%(follower_id)s, %(followee_id)s)
@@ -13,13 +9,11 @@ def follow_user(conn: Connection, *, follower_id: int, followee_id: int) -> dict
     """
     with conn.cursor(row_factory=dict_row) as cur:
         cur.execute(sql, {"follower_id": follower_id, "followee_id": followee_id})
+        conn.commit()
         return cur.fetchone()
 
 
-def unfollow_user(conn: Connection, *, follower_id: int, followee_id: int) -> None:
-    """
-    Follower unfollows followee.
-    """
+def unfollow_user(conn, *, follower_id: int, followee_id: int) -> None:
     sql = """
     DELETE FROM followers
     WHERE follower_id = %(follower_id)s
@@ -27,12 +21,10 @@ def unfollow_user(conn: Connection, *, follower_id: int, followee_id: int) -> No
     """
     with conn.cursor() as cur:
         cur.execute(sql, {"follower_id": follower_id, "followee_id": followee_id})
+        conn.commit()
 
 
-def get_newsfeed(conn: Connection, *, user_id: int) -> list[dict]:
-    """
-    Fetch recent reviews by the user and followed users.
-    """
+def get_newsfeed(conn, *, user_id: int) -> list[dict]:
     sql = """
     SELECT r.id, r.user_id, r.book_id, r.rating, r.content, r.created_at
     FROM reviews r

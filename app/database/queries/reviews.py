@@ -1,34 +1,23 @@
 from psycopg.rows import dict_row
-from psycopg import Connection
 
-def insert_review(
-    conn: Connection, *, user_id: int, book_id: int, rating: int, content: str
-) -> dict:
-    """
-    Insert a review and return the created row.
-    """
+def insert_review(conn, *, user_id: int, book_id: int, rating: int, content: str) -> dict:
     sql = """
     INSERT INTO reviews (user_id, book_id, rating, content)
     VALUES (%(user_id)s, %(book_id)s, %(rating)s, %(content)s)
     RETURNING id, user_id, book_id, rating, content, created_at;
     """
     with conn.cursor(row_factory=dict_row) as cur:
-        cur.execute(
-            sql,
-            {
-                "user_id": user_id,
-                "book_id": book_id,
-                "rating": rating,
-                "content": content,
-            },
-        )
+        cur.execute(sql, {
+            "user_id": user_id,
+            "book_id": book_id,
+            "rating": rating,
+            "content": content
+        })
+        conn.commit()
         return cur.fetchone()
 
 
-def get_review(conn: Connection, *, review_id: int) -> dict | None:
-    """
-    Fetch a single review by ID.
-    """
+def get_review(conn, *, review_id: int) -> dict | None:
     sql = """
     SELECT id, user_id, book_id, rating, content, created_at
     FROM reviews
@@ -39,10 +28,7 @@ def get_review(conn: Connection, *, review_id: int) -> dict | None:
         return cur.fetchone()
 
 
-def list_reviews_by_user(conn: Connection, *, user_id: int) -> list[dict]:
-    """
-    Fetch all reviews by a user, newest first.
-    """
+def list_reviews_by_user(conn, *, user_id: int) -> list[dict]:
     sql = """
     SELECT id, user_id, book_id, rating, content, created_at
     FROM reviews
@@ -54,10 +40,7 @@ def list_reviews_by_user(conn: Connection, *, user_id: int) -> list[dict]:
         return cur.fetchall()
 
 
-def list_reviews_by_book(conn: Connection, *, book_id: int) -> list[dict]:
-    """
-    Fetch all reviews for a book, newest first.
-    """
+def list_reviews_by_book(conn, *, book_id: int) -> list[dict]:
     sql = """
     SELECT id, user_id, book_id, rating, content, created_at
     FROM reviews

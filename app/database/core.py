@@ -1,7 +1,6 @@
-import psycopg
-from psycopg.rows import dict_row
 import os
-from contextlib import contextmanager
+from psycopg import connect
+from psycopg.rows import dict_row
 
 # ------------------------------
 # Configuration from environment
@@ -13,33 +12,13 @@ DB_USER = os.getenv("DB_USER", "postgres")
 DB_PASSWORD = os.getenv("DB_PASSWORD", "postgres")
 
 # ------------------------------
-# Context manager for manual use
-# ------------------------------
-@contextmanager
-def connect():
-    conn = psycopg.connect(
-        host=DB_HOST,
-        port=DB_PORT,
-        dbname=DB_NAME,
-        user=DB_USER,
-        password=DB_PASSWORD,
-        row_factory=dict_row
-    )
-    try:
-        yield conn
-    finally:
-        conn.close()
-
-
-# ------------------------------
-# FastAPI dependency
+# DB Connection Factory
 # ------------------------------
 def get_connection():
     """
-    For FastAPI routes: use as Depends(get_connection)
-    Do NOT wrap in 'with'.
+    Provides a fresh connection. Use it with FastAPI Depends.
     """
-    conn = psycopg.connect(
+    conn = connect(
         host=DB_HOST,
         port=DB_PORT,
         dbname=DB_NAME,

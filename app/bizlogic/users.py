@@ -1,15 +1,13 @@
-from app.database.queries import users as users_queries
-from psycopg import Connection
+# app/bizlogic/users.py
+from app.database.queries.users import insert_user as insert_user_query, get_user as get_user_query, list_users as list_users_query
 
-def list_users(conn: Connection) -> list[dict]:
-    """
-    Fetch all users.
-    """
-    return users_queries.list_users(conn)
+def insert_user(conn, *, name: str):
+    user = insert_user_query(conn, name=name)
+    conn.commit()  # <- COMMIT!
+    return user
 
+def get_user(conn, user_id: int):
+    return get_user_query(conn, user_id=user_id)
 
-def get_user(conn: Connection, user_id: int) -> dict | None:
-    """
-    Fetch a single user by ID.
-    """
-    return users_queries.get_user(conn, user_id=user_id)
+def list_users(conn):
+    return list_users_query(conn)
