@@ -5,6 +5,7 @@ from app.bizlogic import users as users_bl
 from app.bizlogic import books as books_bl
 from app.bizlogic import reviews as reviews_bl
 from app.bizlogic import follows as follows_bl
+from app.database.seed import seed_data
 
 app = FastAPI(title="Goodreads Clone Backend")
 
@@ -26,6 +27,11 @@ class ReviewCreate(BaseModel):
     book_id: int
     rating: int
     content: str
+
+
+@app.on_event("startup")
+def on_startup():
+    seed_data()
 
 
 # ------------------------------
@@ -111,3 +117,8 @@ def api_unfollow_user(followee_id: int, follower_id: int, conn=Depends(get_conne
 @app.get("/users/{user_id}/newsfeed")
 def api_get_newsfeed(user_id: int, conn=Depends(get_connection)):
     return follows_bl.get_newsfeed(conn, user_id)
+
+
+@app.on_event("startup")
+def startup_event():
+    seed_data()

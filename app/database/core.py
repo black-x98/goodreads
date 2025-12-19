@@ -11,6 +11,11 @@ DB_NAME = os.getenv("DB_NAME", "goodreads")
 DB_USER = os.getenv("DB_USER", "postgres")
 DB_PASSWORD = os.getenv("DB_PASSWORD", "postgres")
 
+
+# Read the DB URL from environment, fallback to default
+# Construct the DATABASE_URL dynamically
+DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+
 # ------------------------------
 # DB Connection Factory
 # ------------------------------
