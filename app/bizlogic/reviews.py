@@ -1,16 +1,22 @@
 from app.database.queries import reviews as reviews_queries
 from psycopg import Connection
 
+from app.database.queries.validations import ensure_user_exists, ensure_book_exists
+
+
 def add_review(
-    conn: Connection, *,
-    user_id: int,
-    book_id: int,
-    rating: int,
-    content: str
+        conn: Connection, *,
+        user_id: int,
+        book_id: int,
+        rating: int,
+        content: str
 ) -> dict:
     """
     Insert a new review and return the created review as a dict.
     """
+    ensure_user_exists(conn, user_id)
+    ensure_book_exists(conn, book_id)
+
     return reviews_queries.insert_review(
         conn,
         user_id=user_id,

@@ -1,4 +1,6 @@
+from fastapi import HTTPException
 from psycopg.rows import dict_row
+
 
 def get_user(conn, *, user_id: int) -> dict | None:
     sql = """

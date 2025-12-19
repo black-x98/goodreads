@@ -1,6 +1,13 @@
 from psycopg.rows import dict_row
 
+from app.database.queries.validations import ensure_user_exists
+
+
 def follow_user(conn, *, follower_id: int, followee_id: int) -> dict | None:
+    # Validate users first
+    ensure_user_exists(conn, follower_id)
+    ensure_user_exists(conn, followee_id)
+
     sql = """
     INSERT INTO followers (follower_id, followee_id)
     VALUES (%(follower_id)s, %(followee_id)s)
