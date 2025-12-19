@@ -2,119 +2,94 @@ import requests
 
 BASE_URL = "http://127.0.0.1:8000"
 
-def safe_json(resp):
+# ------------------------------
+# Helper Functions
+# ------------------------------
+def post_json(endpoint, payload):
+    resp = requests.post(f"{BASE_URL}{endpoint}", json=payload)
     try:
-        return resp.json()
+        data = resp.json()
     except Exception:
-        return resp.text or None
+        data = resp.text
+    print(f"POST {endpoint}:", resp.status_code, data)
+    return resp, data
+
+def get(endpoint):
+    resp = requests.get(f"{BASE_URL}{endpoint}")
+    try:
+        data = resp.json()
+    except Exception:
+        data = resp.text
+    print(f"GET {endpoint}:", resp.status_code, data)
+    return resp, data
 
 # ------------------------------
-# Setup test data
+# Seed Data
 # ------------------------------
-def seed_data():
-    print("--- Seeding Test Data ---")
+print("\n--- Seeding Test Data ---")
 
-    # Create users
-    users = [
-        {"name": "Alice"},
-        {"name": "Bob"}
-    ]
-    created_users = []
-    for u in users:
-        resp = requests.post(f"{BASE_URL}/users", json=u)
-        print("POST /users:", resp.status_code, safe_json(resp))
-        if resp.status_code == 200 or resp.status_code == 201:
-            created_users.append(safe_json(resp))
+# Create users
+users_payload = [{"name": "Alice"}, {"name": "Bob"}]
+user_ids = []
+for u in users_payload:
+    resp, data = post_json("/users", u)
+    if resp.status_code == 200 and "id" in data:
+        user_ids.append(data["id"])
 
-    # Create books
-    books = [
-        {"title": "Clean Code", "author": "Robert C. Martin"},
-        {"title": "The Pragmatic Programmer", "author": "Andy Hunt"}
-    ]
-    created_books = []
-    for b in books:
-        resp = requests.post(f"{BASE_URL}/books", json=b)
-        print("POST /books:", resp.status_code, safe_json(resp))
-        if resp.status_code == 200 or resp.status_code == 201:
-            created_books.append(safe_json(resp))
-
-    return created_users, created_books
-
+# Create books
+books_payload = [
+    {"title": "Clean Code", "author": "Robert C. Martin"},
+    {"title": "The Pragmatic Programmer", "author": "Andy Hunt"},
+]
+book_ids = []
+for b in books_payload:
+    resp, data = post_json("/books", b)
+    if resp.status_code == 200 and "id" in data:
+        book_ids.append(data["id"])
 
 # ------------------------------
-# Users Endpoints
+# Test Users Endpoints
 # ------------------------------
-def test_users():
-    print("\n--- Testing Users Endpoints ---")
-    resp = requests.get(f"{BASE_URL}/users")
-    print("GET /users:", resp.status_code, safe_json(resp))
-
-    resp = requests.get(f"{BASE_URL}/users/1")
-    print("GET /users/1:", resp.status_code, safe_json(resp))
-
+print("\n--- Testing Users Endpoints ---")
+get("/users")
+for uid in user_ids:
+    get(f"/users/{uid}")
 
 # ------------------------------
-# Books Endpoints
+# Test Books Endpoints
 # ------------------------------
-def test_books():
-    print("\n--- Testing Books Endpoints ---")
-    resp = requests.get(f"{BASE_URL}/books")
-    print("GET /books:", resp.status_code, safe_json(resp))
-
-    resp = requests.get(f"{BASE_URL}/books/1")
-    print("GET /books/1:", resp.status_code, safe_json(resp))
-
+print("\n--- Testing Books Endpoints ---")
+get("/books")
+for bid in book_ids:
+    get(f"/books/{bid}")
 
 # ------------------------------
-# Reviews Endpoints
+# Test Reviews Endpoints
 # ------------------------------
-def test_reviews():
-    print("\n--- Testing Reviews Endpoints ---")
-    review_data = {
-        "user_id": 1,
-        "book_id": 1,
-        "rating": 5,
-        "content": "Excellent book!"
-    }
+print("\n--- Testing Reviews Endpoints ---")
+# Add review for first book by first user
+review_payload = {
+    "user_id": user_ids[0],
+    "book_id": book_ids[0],
+    "rating": 5,
+    "content": "Excellent book!"
+}
+post_json("/reviews", review_payload)
 
-    # POST review
-    resp = requests.post(f"{BASE_URL}/reviews", json=review_data)
-    print("POST /reviews:", resp.status_code, safe_json(resp))
-
-    # GET reviews by user
-    resp = requests.get(f"{BASE_URL}/users/1/reviews")
-    print("GET /users/1/reviews:", resp.status_code, safe_json(resp))
-
-    # GET reviews by book
-    resp = requests.get(f"{BASE_URL}/books/1/reviews")
-    print("GET /books/1/reviews:", resp.status_code, safe_json(resp))
-
+# List reviews by user
+get(f"/users/{user_ids[0]}/reviews")
+# List reviews by book
+get(f"/books/{book_ids[0]}/reviews")
 
 # ------------------------------
-# Follow / Newsfeed Endpoints
+# Test Follow / Newsfeed Endpoints
 # ------------------------------
-def test_follows():
-    print("\n--- Testing Follows / Newsfeed Endpoints ---")
+print("\n--- Testing Follows / Newsfeed Endpoints ---")
+# First user follows second user
+post_json(f"/follow/{user_ids[1]}?follower_id={user_ids[0]}", {})
 
-    # Alice follows Bob (user 1 follows user 2)
-    resp = requests.post(f"{BASE_URL}/follow/2", params={"follower_id": 1})
-    print("POST /follow/2:", resp.status_code, safe_json(resp))
+# Check newsfeed for first user
+get(f"/users/{user_ids[0]}/newsfeed")
 
-    # GET newsfeed for Alice (user 1)
-    resp = requests.get(f"{BASE_URL}/users/1/newsfeed")
-    print("GET /users/1/newsfeed:", resp.status_code, safe_json(resp))
-
-    # Unfollow
-    resp = requests.post(f"{BASE_URL}/unfollow/2", params={"follower_id": 1})
-    print("POST /unfollow/2:", resp.status_code, safe_json(resp))
-
-
-# ------------------------------
-# Run All Tests
-# ------------------------------
-if __name__ == "__main__":
-    seed_data()
-    test_users()
-    test_books()
-    test_reviews()
-    test_follows()
+# First user unfollows second user
+post_json(f"/unfollow/{user_ids[1]}?follower_id={user_ids[0]}", {})
