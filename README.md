@@ -53,7 +53,7 @@ This will:
 
 Wait until the API logs show:
 
-    INFO: Waiting for application startup.
+    goodreads_api  | INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
 
 This means the API is ready.
 
