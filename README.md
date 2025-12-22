@@ -83,6 +83,8 @@ On startup, the API automatically inserts seed data if it doesn't already exist.
 
     Follower relationships between users
 
+Note: The seeding is fully idempotent. Restarting the container will not create duplicates.
+
 The API uses environment variables for DB connection. Defaults are:
 
       DB_HOST=db
