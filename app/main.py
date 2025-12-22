@@ -13,11 +13,6 @@ from app.models.users import UserCreate
 app = FastAPI(title="Goodreads Clone Backend")
 
 
-@app.on_event("startup")
-def on_startup():
-    seed_data()
-
-
 # ------------------------------
 # User Routes
 # ------------------------------
