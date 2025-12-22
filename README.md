@@ -99,6 +99,10 @@ To stop the containers:
 
 To persist DB data between runs, the project uses a Docker volume postgres_data.
 
+To run the unit tests for the project, run the following command: 
+
+    pytest tests/
+
 To run a basic integration test of the project, run the following command: 
 
     python3.12 tests/integration_test.py
