@@ -1,6 +1,5 @@
 """
 Unit tests for the Goodreads Clone API
-Run with: pytest tests/test_api.py -v
 """
 import pytest
 from fastapi.testclient import TestClient
