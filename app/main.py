@@ -1,10 +1,12 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, Depends, HTTPException
-from pydantic import BaseModel
-from app.database.core import get_connection
-from app.bizlogic import users as users_bl
+
 from app.bizlogic import books as books_bl
-from app.bizlogic import reviews as reviews_bl
 from app.bizlogic import follows as follows_bl
+from app.bizlogic import reviews as reviews_bl
+from app.bizlogic import users as users_bl
+from app.database.core import get_connection
 from app.database.seed import seed_data
 from app.models.books import BookCreate
 from app.models.reviews import ReviewCreate
@@ -98,6 +100,10 @@ def api_get_newsfeed(user_id: int, conn=Depends(get_connection)):
     return follows_bl.get_newsfeed(conn, user_id)
 
 
-@app.on_event("startup")
-def startup_event():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup: seed the database
     seed_data()
+    yield
+    # Shutdown: cleanup if needed
+    pass
