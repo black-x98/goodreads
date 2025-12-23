@@ -1,3 +1,4 @@
+import asyncio
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Depends, HTTPException
@@ -12,7 +13,16 @@ from app.models.books import BookCreate
 from app.models.reviews import ReviewCreate
 from app.models.users import UserCreate
 
-app = FastAPI(title="Goodreads Clone Backend")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Run the synchronous seeding in a threadpool and wait for it to finish
+    print("seeding data from fastapi hook")
+    await asyncio.to_thread(seed_data)
+    yield  # after this, FastAPI starts handling requests
+
+
+app = FastAPI(title="Goodreads Clone Backend", lifespan=lifespan)
 
 
 # ------------------------------
@@ -98,12 +108,3 @@ def api_unfollow_user(followee_id: int, follower_id: int, conn=Depends(get_conne
 @app.get("/users/{user_id}/newsfeed")
 def api_get_newsfeed(user_id: int, conn=Depends(get_connection)):
     return follows_bl.get_newsfeed(conn, user_id)
-
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    # Startup: seed the database
-    seed_data()
-    yield
-    # Shutdown: cleanup if needed
-    pass
